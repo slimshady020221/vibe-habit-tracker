@@ -1,136 +1,161 @@
+// src/App.jsx (Day 13: 최종 통합 및 구조 복구 버전)
+
 import React, { useState, useEffect, useMemo } from 'react';
-import { loadHabits, saveHabits, exportData, importData } from './utils/localStorage';
-import HabitList from './components/HabitList';
+
+// === 컴포넌트 import (Day 13 구조 복구) ===
+import HabitList from './components/HabitList'; 
 import HabitForm from './components/HabitForm';
 import CalendarDashboard from './components/CalendarDashboard';
+// ===================================
 
-const App = () => {
+// LocalStorage 유틸리티
+import { loadHabits, saveHabits, checkHabitToday } from './utils/localStorage'; 
+
+function App() {
   const [habits, setHabits] = useState([]);
-  const [isFormVisible, setIsFormVisible] = useState(false);
-  const [sortKey, setSortKey] = useState('name');
+  const [isFormOpen, setIsFormOpen] = useState(false); 
+  const [sortKey, setSortKey] = useState('name'); 
+  
+  // Day 10: 다크 모드 상태 추가 및 LocalStorage 동기화
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const savedMode = localStorage.getItem('darkMode');
     return savedMode ? JSON.parse(savedMode) : false;
-  });
+  }); 
 
+  // 1. 초기 로딩 (Local Storage)
   useEffect(() => {
     setHabits(loadHabits());
   }, []);
 
+  // 2. 습관 및 다크 모드 상태 저장
   useEffect(() => {
     saveHabits(habits);
-  }, [habits]);
+    localStorage.setItem('darkMode', JSON.stringify(isDarkMode)); 
+    document.documentElement.classList.toggle('dark', isDarkMode);
+  }, [habits, isDarkMode]);
 
-  useEffect(() => {
-    localStorage.setItem('darkMode', JSON.stringify(isDarkMode));
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
+  // CRUD - C/U 기능 처리 (Day 11: customColor 필드 수용)
+  const handleSaveHabit = (newHabit) => {
+    if (newHabit.id) {
+      setHabits(habits.map(h => (h.id === newHabit.id ? newHabit : h)));
     } else {
-      document.documentElement.classList.remove('dark');
+      setHabits([...habits, { 
+        ...newHabit, 
+        id: Date.now(), 
+        records: [], 
+        name: newHabit.name || "새 습관",
+        type: newHabit.type || 'daily', 
+        targetCount: newHabit.targetCount || 1,
+        customColor: newHabit.customColor || '#4f46e5' // Day 11 필드 추가
+      }]);
     }
-  }, [isDarkMode]);
-
-  const handleSaveHabit = (habitData) => {
-    const newHabitObject = {
-      id: Date.now(),
-      completedDates: [],
-      ...habitData,
-    };
-    setHabits([...habits, newHabitObject]);
-    setIsFormVisible(false);
+    setIsFormOpen(false);
   };
 
-  const handleDeleteHabit = (habitId) => {
-    setHabits(habits.filter(habit => habit.id !== habitId));
+  // CRUD - D 기능 처리 (삭제)
+  const handleDeleteHabit = (id) => {
+    if (window.confirm('정말로 이 습관을 삭제하시겠습니까?')) {
+        setHabits(habits.filter(h => h.id !== id));
+    }
   };
 
+  // 핵심 기능 1: 일일 체크
   const handleCheck = (habitId) => {
-    const today = new Date().toISOString().slice(0, 10);
-    setHabits(habits.map(habit => {
+    const updatedHabits = habits.map(habit => {
       if (habit.id === habitId) {
-        const completedDates = habit.completedDates || [];
-        if (completedDates.includes(today)) {
-          return { ...habit, completedDates: completedDates.filter(date => date !== today) };
-        } else {
-          return { ...habit, completedDates: [...completedDates, today] };
-        }
+        return checkHabitToday(habit);
       }
       return habit;
-    }));
+    });
+    setHabits(updatedHabits);
   };
 
+  // Day 6: 정렬 로직
   const sortedHabits = useMemo(() => {
-    const sortableHabits = [...habits];
-    if (sortKey === 'name') {
-      sortableHabits.sort((a, b) => a.name.localeCompare(b.name));
-    }
-    return sortableHabits;
+      const sortableHabits = [...habits];
+      
+      sortableHabits.sort((a, b) => {
+          if (sortKey === 'name') {
+              return a.name.localeCompare(b.name);
+          }
+          if (sortKey === 'id') { 
+              return b.id - a.id; 
+          }
+          return 0;
+      });
+      return sortableHabits;
   }, [habits, sortKey]);
 
   return (
-    <div className={isDarkMode ? 'dark' : ''}>
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 font-sans">
-        <header className="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-10">
-          <div className="max-w-4xl mx-auto py-4 px-4 flex justify-between items-center">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Vibe Habit Tracker</h1>
-            <div className="flex items-center space-x-2">
-              <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                {isDarkMode ? '☀️' : '🌙'}
-              </button>
-              <button
-                onClick={importData}
-                className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 shadow-sm"
-              >
-                가져오기
-              </button>
-              <button
-                onClick={exportData}
-                className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 shadow-sm"
-              >
-                내보내기
-              </button>
-              <button
-                onClick={() => setIsFormVisible(true)}
-                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
-              >
-                + 새 습관
-              </button>
-            </div>
-          </div>
-        </header>
+    // Day 10: 다크 모드 적용을 위한 클래스
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-8 transition-colors duration-500">
+      
+      {/* Day 10: 다크 모드 토글 버튼 */}
+      <button 
+        onClick={() => setIsDarkMode(!isDarkMode)} 
+        className="p-2 rounded-full absolute top-4 right-4 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors z-20"
+      >
+        {isDarkMode ? '🌞 Light' : '🌙 Dark'}
+      </button>
 
-        <main className="max-w-4xl mx-auto py-6 px-4">
-          <div className="mb-6">
-              <CalendarDashboard habits={habits} />
-          </div>
+      <header className="text-center mb-8">
+        <h1 className="text-4xl font-bold text-indigo-700 dark:text-indigo-400">Vibe Habit Tracker</h1>
+        <p className="text-gray-500 dark:text-gray-400">바이브 코딩 기말 프로젝트</p>
+      </header>
 
-          <div className="mb-4 flex justify-end">
-              <select 
-                  onChange={(e) => setSortKey(e.target.value)} 
-                  value={sortKey}
-                  className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
-              >
-                  <option value="name">이름순 (A-Z)</option>
-              </select>
-          </div>
+      {/* 습관 추가 버튼 */}
+      <button 
+        onClick={() => setIsFormOpen(true)}
+        className="fixed bottom-6 right-6 p-4 rounded-full bg-indigo-500 text-white shadow-lg hover:bg-indigo-600 transition-all z-10"
+      >
+        + 새 습관
+      </button>
 
-          <HabitList
-            habits={sortedHabits}
-            onCheck={handleCheck}
-            onDelete={handleDeleteHabit}
-          />
+      {/* Habit Form Modal */}
+      {isFormOpen && (
+        <HabitForm 
+          onSave={handleSaveHabit} 
+          onClose={() => setIsFormOpen(false)}
+        />
+      )}
 
-          {isFormVisible && (
-            <HabitForm
-              show={isFormVisible}
-              onClose={() => setIsFormVisible(false)}
-              onSave={handleSaveHabit}
-            />
-          )}
-        </main>
+      {/* Day 6: 정렬 UI */}
+      <div className="flex justify-end mb-4 max-w-7xl mx-auto lg:max-w-[calc(66.6666%-1rem)]">
+          <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mr-2 self-center">정렬 기준:</label>
+          <select
+              value={sortKey}
+              onChange={(e) => setSortKey(e.target.value)}
+              className="p-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white"
+          >
+              <option value="name">이름순 (A-Z)</option>
+              <option value="id">최신 등록순</option>
+          </select>
       </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+        
+        {/* 오늘 할 일 목록 */}
+        <div className="lg:col-span-2">
+          <h2 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">오늘의 습관</h2>
+          <HabitList 
+            habits={sortedHabits} 
+            onCheck={handleCheck} 
+            onDelete={handleDeleteHabit} 
+          />
+        </div>
+
+        {/* 월별 대시보드 (핵심 기능 3) */}
+        <div className="lg:col-span-1">
+          <h2 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">월별 기록</h2>
+          <CalendarDashboard habits={habits} />
+        </div>
+      </div>
+
+      <footer className="text-center mt-10 text-gray-400 dark:text-gray-600 text-sm">
+          &copy; 2025 Vibe Coding Project. Developed with Gemini CLI.
+      </footer>
     </div>
   );
-};
+}
 
 export default App;
