@@ -44,3 +44,9 @@
   1. React와 Tailwind CSS를 사용하여 CalendarDashboard.jsx 컴포넌트를 만들어줘. habits 배열을 받아 월별로 습관 기록(records)을 시각화하는 간단한 달력 대시보드 UI를 구현해줘. 각 날짜 블록에 성공 여부를 색상으로 표시해야 해. 파일 경로는 src/components/CalendarDashboard.jsx야.
 - **결과 및 수정사항**: 모든 컴포넌트가 의도대로 동작함을 확인. App.jsx의 레이아웃을 Tailwind 그리드 시스템으로 수정하여 반응형 디자인 완성.
 - **학습 내용**: AI의 초기 코드를 받더라도, 프로젝트의 아키텍처(컴포넌트 간 데이터 흐름 및 레이아웃)는 개발자가 직접 통합하고 조정해야 함.
+
+### Day 5 (2025.10.27) - 기능 확장: 목표 타입 설정
+- **작업 내용**: 습관 목표 설정 타입(Daily/Weekly/Monthly) 및 목표 횟수(targetCount) 기능을 HabitForm에 구현하여 데이터 구조를 확장함.
+- **Gemini CLI 사용 프롬프트**: HabitForm.jsx 컴포넌트에 Daily, Weekly, Monthly를 선택하는 라디오 버튼 UI와 목표 횟수(targetCount)를 입력하는 input 필드를 추가해줘. 이 값들을 상태로 관리하고, onSave 함수로 전달하도록 코드를 수정해줘. Tailwind CSS로 스타일링해야 해.
+- **결과 및 수정사항**: UI 요소와 데이터 상태 로직 구현 성공. App.jsx의 handleSaveHabit 함수가 새로운 필드(type, targetCount)를 수용하도록 확인 및 수정.
+- **학습 내용**: AI에게 UI 요소와 함께 데이터 흐름(상태 관리 및 props 전달)까지 명확히 요청하는 것이 코딩 시간을 단축시킴.
