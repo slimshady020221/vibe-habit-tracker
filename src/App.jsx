@@ -22,9 +22,18 @@ function App() {
     return savedMode ? JSON.parse(savedMode) : false;
   }); 
 
-  // 1. 초기 로딩 및 습관 상태 저장
+  // 1. 초기 로딩 시 데이터 유효성 검사 및 상태 저장
   useEffect(() => {
-    setHabits(loadHabits());
+    const loadedHabits = loadHabits().map(habit => ({
+      ...habit,
+      id: habit.id || crypto.randomUUID(),
+      name: habit.name || "이름 없는 습관",
+      records: Array.isArray(habit.records) ? habit.records : [],
+      type: habit.type || 'daily',
+      targetCount: habit.targetCount || 1,
+      customColor: habit.customColor || '#4f46e5'
+    }));
+    setHabits(loadedHabits);
   }, []);
 
   // 2. 습관 및 다크 모드 상태 저장
@@ -43,7 +52,7 @@ function App() {
     } else {
       setHabits([...habits, { 
         ...newHabit, 
-        id: Date.now(), 
+        id: crypto.randomUUID(), 
         records: [], 
         name: newHabit.name || "새 습관",
         type: newHabit.type || 'daily', 
