@@ -1,12 +1,12 @@
-// src/App.jsx (Day 13: 최종 통합 및 구조 복구 버전)
+// src/App.jsx (Day 14 최종 통합 및 코드 정리 버전)
 
 import React, { useState, useEffect, useMemo } from 'react';
 
-// === 컴포넌트 import (Day 13 구조 복구) ===
+// === 컴포넌트 import ===
 import HabitList from './components/HabitList'; 
 import HabitForm from './components/HabitForm';
 import CalendarDashboard from './components/CalendarDashboard';
-// ===================================
+// ====================
 
 // LocalStorage 유틸리티
 import { loadHabits, saveHabits, checkHabitToday } from './utils/localStorage'; 
@@ -22,7 +22,7 @@ function App() {
     return savedMode ? JSON.parse(savedMode) : false;
   }); 
 
-  // 1. 초기 로딩 (Local Storage)
+  // 1. 초기 로딩 및 습관 상태 저장
   useEffect(() => {
     setHabits(loadHabits());
   }, []);
@@ -33,6 +33,8 @@ function App() {
     localStorage.setItem('darkMode', JSON.stringify(isDarkMode)); 
     document.documentElement.classList.toggle('dark', isDarkMode);
   }, [habits, isDarkMode]);
+
+  // Day 13: console.log 제거 등의 정리 작업을 했으므로, 주석을 제거하고 함수 본체만 유지합니다.
 
   // CRUD - C/U 기능 처리 (Day 11: customColor 필드 수용)
   const handleSaveHabit = (newHabit) => {
@@ -46,7 +48,7 @@ function App() {
         name: newHabit.name || "새 습관",
         type: newHabit.type || 'daily', 
         targetCount: newHabit.targetCount || 1,
-        customColor: newHabit.customColor || '#4f46e5' // Day 11 필드 추가
+        customColor: newHabit.customColor || '#4f46e5' 
       }]);
     }
     setIsFormOpen(false);
@@ -87,7 +89,6 @@ function App() {
   }, [habits, sortKey]);
 
   return (
-    // Day 10: 다크 모드 적용을 위한 클래스
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-8 transition-colors duration-500">
       
       {/* Day 10: 다크 모드 토글 버튼 */}
