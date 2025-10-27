@@ -29,3 +29,11 @@
   2. React 컴포넌트 전문가로서, App.jsx에 LocalStorage 유틸리티를 import하여 습관 데이터 관리 상태 로직을 완성해줘. CRUD 함수(handleSaveHabit, handleDeleteHabit, handleCheck)를 포함하고, Tailwind CSS를 사용한 앱의 기본 레이아웃을 완성해줘. 파일 경로는 src/App.jsx야.
 - **결과 및 수정사항**: 초기 로직 생성 성공. 'Streak' 계산 로직은 다음 단계에서 디버깅이 필요함.
 - **학습 내용**: AI에게 유틸리티 코드와 메인 로직을 분리하여 요청하는 것이 효과적이며, 파일 경로를 명시하면 편리함.
+
+### Day 3 (2025.10.27) - UI 컴포넌트 생성
+- **작업 내용**: HabitForm(CRUD 폼), HabitList(목록 및 Streak 표시) 컴포넌트 구현 및 App.jsx 통합 준비.
+- **Gemini CLI 사용 프롬프트**:
+  1. React와 Tailwind CSS를 사용하여 HabitForm.jsx 컴포넌트를 만들어줘. 습관 이름(name)을 입력받아 상위 컴포넌트의 onSave 함수를 호출하는 폼이어야 해. 모달(Modal) 형태로 렌더링되도록 스타일링하고, 파일 경로는 src/components/HabitForm.jsx야.
+  2. React와 Tailwind CSS를 사용하여 HabitList.jsx 컴포넌트를 만들어줘. habits 배열을 받아 목록을 렌더링하고, 각 항목에 일일 체크 버튼(handleCheck 호출)과 연속 성공일(Streak)을 표시하는 뱃지를 포함해줘. 파일 경로는 src/components/HabitList.jsx야.
+- **결과 및 수정사항**: CRUD 폼 및 목록 UI 초안 생성. 다음 단계에서 App.jsx에 import 후 연결 필요.
+- **학습 내용**: AI에게 복잡한 로직 구현 후 UI 요청 시, 데이터 흐름(props)을 명확히 정의해줘야 오류가 적음을 확인.
