@@ -56,3 +56,9 @@
 - **Gemini CLI 사용 프롬프트**: App.jsx의 habits 배열을 이름(name)을 기준으로 오름차순 정렬하는 sortHabits 함수를 구현해줘. 이 정렬 로직을 컴포넌트 내에 상태(sortKey)로 관리하며, 정렬 키가 변경될 때마다 habits 배열을 정렬하는 로직을 App.jsx에 추가해줘. Tailwind CSS로 간단한 정렬 드롭다운 UI도 App.jsx에 추가해줘.
 - **결과 및 수정사항**: 정렬 기능 구현 성공. 계산 부하를 줄이기 위해 `useMemo`를 사용하여 정렬 로직을 최적화함. (AI-assisted 최적화)
 - **학습 내용**: React에서 계산량이 많은 로직은 `useMemo`를 사용하여 성능을 최적화해야 함을 AI 생성 코드를 통해 학습하고 적용함.
+
+### Day 7 (2025.10.27) - 기능 확장: 완료율 대시보드
+- **작업 내용**: HabitList에 목표 횟수 대비 현재 기록을 시각화하는 Progress Bar를 추가함. `calculateProgress` 함수를 구현하여 진행률을 계산함.
+- **Gemini CLI 사용 프롬프트**: HabitList.jsx의 각 습관 항목에 Tailwind CSS를 사용한 Progress Bar 컴포넌트를 추가하고, 목표 횟수(targetCount) 대비 현재 성공 기록(records.length) 비율을 표시해줘.
+- **결과 및 수정사항**: Progress Bar UI와 계산 로직 구현 성공. Progress Bar의 스타일링을 Tailwind CSS로 완성하여 반응형 UI에 통합함. (AI 생성 코드를 수동 통합)
+- **학습 내용**: UI 구현 시 동적인 스타일링(width: `${progress}%`)에 JavaScript 변수를 사용하는 방법을 AI 코드를 통해 효과적으로 적용함.
