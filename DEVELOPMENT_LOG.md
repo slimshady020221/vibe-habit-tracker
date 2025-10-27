@@ -62,3 +62,9 @@
 - **Gemini CLI 사용 프롬프트**: HabitList.jsx의 각 습관 항목에 Tailwind CSS를 사용한 Progress Bar 컴포넌트를 추가하고, 목표 횟수(targetCount) 대비 현재 성공 기록(records.length) 비율을 표시해줘.
 - **결과 및 수정사항**: Progress Bar UI와 계산 로직 구현 성공. Progress Bar의 스타일링을 Tailwind CSS로 완성하여 반응형 UI에 통합함. (AI 생성 코드를 수동 통합)
 - **학습 내용**: UI 구현 시 동적인 스타일링(width: `${progress}%`)에 JavaScript 변수를 사용하는 방법을 AI 코드를 통해 효과적으로 적용함.
+
+### Day 8 (2025.10.27) - 데이터 관리: 백업 및 복원
+- **작업 내용**: Local Storage 데이터를 JSON 파일로 내보내기/가져오기 할 수 있는 백업 및 복원 유틸리티(`exportData`, `importData`)를 `localStorage.js`에 추가함.
+- **Gemini CLI 사용 프롬프트**: src/utils/localStorage.js 파일에 LocalStorage 데이터를 JSON 파일로 다운로드하고 업로드하는 exportData, importData 함수를 순수 JavaScript로 작성해줘. 파일 I/O 처리가 포함되어야 해.
+- **결과 및 수정사항**: 파일 처리 로직 구현 성공. 파일 업로드 시 데이터 구조 유효성 검사 로직을 수동으로 보강하여 안전성을 확보함.
+- **학습 내용**: AI를 사용하여 복잡한 파일 I/O 로직을 빠르게 구현할 수 있었으며, 특히 Blob 및 FileReader 사용법을 익힘.
