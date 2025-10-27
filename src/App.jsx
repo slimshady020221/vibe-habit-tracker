@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 // === 컴포넌트 import ===
 import HabitList from './components/HabitList'; 
@@ -6,12 +6,13 @@ import HabitForm from './components/HabitForm';
 import CalendarDashboard from './components/CalendarDashboard';
 // ====================
 
-// LocalStorage 유틸리티는 다음 단계에서 생성된 코드를 사용한다고 가정
+// LocalStorage 유틸리티
 import { loadHabits, saveHabits, checkHabitToday } from './utils/localStorage'; 
 
 function App() {
   const [habits, setHabits] = useState([]);
   const [isFormOpen, setIsFormOpen] = useState(false); // 습관 추가 폼 모달 상태
+  const [sortKey, setSortKey] = useState('name'); // Day 6: 정렬 기준 상태
 
   // 1. 초기 로딩 (Local Storage)
   useEffect(() => {
@@ -20,7 +21,6 @@ function App() {
 
   // 2. 습관 상태 저장
   useEffect(() => {
-    // habits 배열이 변경될 때마다 LocalStorage에 저장
     saveHabits(habits);
   }, [habits]);
 
@@ -35,7 +35,9 @@ function App() {
         ...newHabit, 
         id: Date.now(), 
         records: [], // 날짜 기록 배열 (YYYY-MM-DD 형식)
-        name: newHabit.name || "새 습관"
+        name: newHabit.name || "새 습관",
+        type: newHabit.type || 'daily', // Day 5 기능 필드 추가
+        targetCount: newHabit.targetCount || 1, // Day 5 기능 필드 추가
       }]);
     }
     setIsFormOpen(false);
@@ -60,6 +62,25 @@ function App() {
     setHabits(updatedHabits);
   };
 
+  // Day 6: 정렬 로직 (useMemo로 성능 최적화)
+  const sortedHabits = useMemo(() => {
+      const sortableHabits = [...habits];
+      
+      sortableHabits.sort((a, b) => {
+          if (sortKey === 'name') {
+              // 이름순 정렬
+              return a.name.localeCompare(b.name);
+          }
+          if (sortKey === 'id') { 
+              // 최신 등록순 정렬 (내림차순)
+              return b.id - a.id; 
+          }
+          return 0;
+      });
+
+      return sortableHabits;
+  }, [habits, sortKey]);
+
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-8">
       <header className="text-center mb-8">
@@ -76,16 +97,33 @@ function App() {
       </button>
 
       {/* Habit Form Modal */}
-      {isFormOpen && <HabitForm onSave={handleSaveHabit} onClose={() => setIsFormOpen(false)} />}
+      {isFormOpen && (
+        <HabitForm 
+          onSave={handleSaveHabit} 
+          onClose={() => setIsFormOpen(false)}
+        />
+      )}
+
+      {/* Day 6: 정렬 UI */}
+      <div className="flex justify-end mb-4 max-w-7xl mx-auto lg:max-w-[calc(66.6666%-1rem)]">
+          <label className="text-sm font-medium text-gray-700 mr-2 self-center">정렬 기준:</label>
+          <select
+              value={sortKey}
+              onChange={(e) => setSortKey(e.target.value)}
+              className="p-2 border border-gray-300 rounded-lg"
+          >
+              <option value="name">이름순 (A-Z)</option>
+              <option value="id">최신 등록순</option>
+          </select>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
         
         {/* 오늘 할 일 목록 */}
         <div className="lg:col-span-2">
           <h2 className="text-2xl font-semibold mb-4 text-gray-800">오늘의 습관</h2>
-          {/* HabitList 컴포넌트 사용 */}
           <HabitList 
-            habits={habits} 
+            habits={sortedHabits} /* 수정된 부분: sortedHabits 전달 */
             onCheck={handleCheck} 
             onDelete={handleDeleteHabit} 
           />
@@ -94,7 +132,6 @@ function App() {
         {/* 월별 대시보드 (핵심 기능 3) */}
         <div className="lg:col-span-1">
           <h2 className="text-2xl font-semibold mb-4 text-gray-800">월별 기록</h2>
-          {/* CalendarDashboard 컴포넌트 사용 */}
           <CalendarDashboard habits={habits} />
         </div>
       </div>

@@ -50,3 +50,9 @@
 - **Gemini CLI 사용 프롬프트**: HabitForm.jsx 컴포넌트에 Daily, Weekly, Monthly를 선택하는 라디오 버튼 UI와 목표 횟수(targetCount)를 입력하는 input 필드를 추가해줘. 이 값들을 상태로 관리하고, onSave 함수로 전달하도록 코드를 수정해줘. Tailwind CSS로 스타일링해야 해.
 - **결과 및 수정사항**: UI 요소와 데이터 상태 로직 구현 성공. App.jsx의 handleSaveHabit 함수가 새로운 필드(type, targetCount)를 수용하도록 확인 및 수정.
 - **학습 내용**: AI에게 UI 요소와 함께 데이터 흐름(상태 관리 및 props 전달)까지 명확히 요청하는 것이 코딩 시간을 단축시킴.
+
+### Day 6 (2025.10.27) - 기능 확장: 습관 정렬 기능
+- **작업 내용**: App.jsx에 정렬 기준 상태(`sortKey`)를 추가하고, `useMemo`를 활용하여 습관 목록을 이름순 또는 최신 등록순으로 정렬하는 기능을 구현함. 정렬 기준을 선택하는 드롭다운 UI도 추가함.
+- **Gemini CLI 사용 프롬프트**: App.jsx의 habits 배열을 이름(name)을 기준으로 오름차순 정렬하는 sortHabits 함수를 구현해줘. 이 정렬 로직을 컴포넌트 내에 상태(sortKey)로 관리하며, 정렬 키가 변경될 때마다 habits 배열을 정렬하는 로직을 App.jsx에 추가해줘. Tailwind CSS로 간단한 정렬 드롭다운 UI도 App.jsx에 추가해줘.
+- **결과 및 수정사항**: 정렬 기능 구현 성공. 계산 부하를 줄이기 위해 `useMemo`를 사용하여 정렬 로직을 최적화함. (AI-assisted 최적화)
+- **학습 내용**: React에서 계산량이 많은 로직은 `useMemo`를 사용하여 성능을 최적화해야 함을 AI 생성 코드를 통해 학습하고 적용함.
