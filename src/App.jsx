@@ -1,116 +1,109 @@
-
 import React, { useState, useEffect } from 'react';
-import { loadHabits, saveHabits } from './utils/localStorage';
-import { getStreak } from './utils/localStorage';
 
-const App = () => {
+// === 컴포넌트 import ===
+import HabitList from './components/HabitList'; 
+import HabitForm from './components/HabitForm';
+import CalendarDashboard from './components/CalendarDashboard';
+// ====================
+
+// LocalStorage 유틸리티는 다음 단계에서 생성된 코드를 사용한다고 가정
+import { loadHabits, saveHabits, checkHabitToday } from './utils/localStorage'; 
+
+function App() {
   const [habits, setHabits] = useState([]);
-  const [newHabit, setNewHabit] = useState('');
+  const [isFormOpen, setIsFormOpen] = useState(false); // 습관 추가 폼 모달 상태
 
+  // 1. 초기 로딩 (Local Storage)
   useEffect(() => {
     setHabits(loadHabits());
   }, []);
 
+  // 2. 습관 상태 저장
   useEffect(() => {
+    // habits 배열이 변경될 때마다 LocalStorage에 저장
     saveHabits(habits);
   }, [habits]);
 
-  const handleSaveHabit = () => {
-    if (newHabit.trim() === '') return;
-    const newHabitObject = {
-      id: Date.now(),
-      name: newHabit,
-      completedDates: [],
-    };
-    setHabits([...habits, newHabitObject]);
-    setNewHabit('');
+  // CRUD - C/U 기능 처리 (새 습관 추가 또는 수정)
+  const handleSaveHabit = (newHabit) => {
+    if (newHabit.id) {
+      // 수정 (Update)
+      setHabits(habits.map(h => (h.id === newHabit.id ? newHabit : h)));
+    } else {
+      // 생성 (Create) - 고유 ID 및 빈 기록 배열 부여
+      setHabits([...habits, { 
+        ...newHabit, 
+        id: Date.now(), 
+        records: [], // 날짜 기록 배열 (YYYY-MM-DD 형식)
+        name: newHabit.name || "새 습관"
+      }]);
+    }
+    setIsFormOpen(false);
   };
 
-  const handleDeleteHabit = (habitId) => {
-    setHabits(habits.filter(habit => habit.id !== habitId));
+  // CRUD - D 기능 처리 (삭제)
+  const handleDeleteHabit = (id) => {
+    if (window.confirm('정말로 이 습관을 삭제하시겠습니까?')) {
+        setHabits(habits.filter(h => h.id !== id));
+    }
   };
 
+  // 핵심 기능 1: 일일 체크
   const handleCheck = (habitId) => {
-    const today = new Date().toISOString().slice(0, 10);
-    setHabits(habits.map(habit => {
+    const updatedHabits = habits.map(habit => {
       if (habit.id === habitId) {
-        const completedDates = habit.completedDates || [];
-        if (completedDates.includes(today)) {
-          // 이미 체크된 경우, 체크 해제
-          return { ...habit, completedDates: completedDates.filter(date => date !== today) };
-        } else {
-          // 체크되지 않은 경우, 체크
-          return { ...habit, completedDates: [...completedDates, today] };
-        }
+        // LocalStorage 유틸리티의 checkHabitToday 함수 사용
+        return checkHabitToday(habit);
       }
       return habit;
-    }));
+    });
+    setHabits(updatedHabits);
   };
 
-
   return (
-    <div className="min-h-screen bg-gray-100 font-sans">
-      <header className="bg-white shadow">
-        <div className="max-w-3xl mx-auto py-6 px-4">
-          <h1 className="text-3xl font-bold text-gray-900">Vibe Habit Tracker</h1>
-        </div>
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-8">
+      <header className="text-center mb-8">
+        <h1 className="text-4xl font-bold text-indigo-700">Vibe Habit Tracker</h1>
+        <p className="text-gray-500">바이브 코딩 기말 프로젝트</p>
       </header>
-      <main className="max-w-3xl mx-auto py-6 px-4">
-        <div className="bg-white p-6 rounded-lg shadow mb-6">
-          <h2 className="text-xl font-semibold mb-4">새로운 습관 추가</h2>
-          <div className="flex">
-            <input
-              type="text"
-              value={newHabit}
-              onChange={(e) => setNewHabit(e.target.value)}
-              placeholder="예: 매일 아침 30분 운동하기"
-              className="flex-grow p-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button
-              onClick={handleSaveHabit}
-              className="bg-blue-500 text-white px-4 py-2 rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              추가
-            </button>
-          </div>
+
+      {/* 습관 추가 버튼 */}
+      <button 
+        onClick={() => setIsFormOpen(true)}
+        className="fixed bottom-6 right-6 p-4 rounded-full bg-indigo-500 text-white shadow-lg hover:bg-indigo-600 transition-all z-10"
+      >
+        + 새 습관
+      </button>
+
+      {/* Habit Form Modal */}
+      {isFormOpen && <HabitForm onSave={handleSaveHabit} onClose={() => setIsFormOpen(false)} />}
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+        
+        {/* 오늘 할 일 목록 */}
+        <div className="lg:col-span-2">
+          <h2 className="text-2xl font-semibold mb-4 text-gray-800">오늘의 습관</h2>
+          {/* HabitList 컴포넌트 사용 */}
+          <HabitList 
+            habits={habits} 
+            onCheck={handleCheck} 
+            onDelete={handleDeleteHabit} 
+          />
         </div>
 
-        <div>
-          <h2 className="text-xl font-semibold mb-4">나의 습관 목록</h2>
-          {habits.length > 0 ? (
-            <ul className="space-y-4">
-              {habits.map(habit => (
-                <li key={habit.id} className="bg-white p-4 rounded-lg shadow flex items-center justify-between">
-                  <div>
-                    <span className="font-medium">{habit.name}</span>
-                    <span className="text-sm text-gray-500 ml-4">
-                      연속 성공: {getStreak(habit.completedDates)}일
-                    </span>
-                  </div>
-                  <div className="flex items-center">
-                     <button
-                      onClick={() => handleCheck(habit.id)}
-                      className={`w-8 h-8 rounded-full border-2 ${habit.completedDates && habit.completedDates.includes(new Date().toISOString().slice(0, 10)) ? 'bg-green-500 border-green-500' : 'border-gray-300'}`}
-                    >
-                      {habit.completedDates && habit.completedDates.includes(new Date().toISOString().slice(0, 10)) && '✔'}
-                    </button>
-                    <button
-                      onClick={() => handleDeleteHabit(habit.id)}
-                      className="ml-4 text-red-500 hover:text-red-700"
-                    >
-                      삭제
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-gray-500">아직 등록된 습관이 없습니다. 새로운 습관을 추가해보세요!</p>
-          )}
+        {/* 월별 대시보드 (핵심 기능 3) */}
+        <div className="lg:col-span-1">
+          <h2 className="text-2xl font-semibold mb-4 text-gray-800">월별 기록</h2>
+          {/* CalendarDashboard 컴포넌트 사용 */}
+          <CalendarDashboard habits={habits} />
         </div>
-      </main>
+      </div>
+
+      <footer className="text-center mt-10 text-gray-400 text-sm">
+          &copy; 2025 Vibe Coding Project. Developed with Gemini CLI.
+      </footer>
     </div>
   );
-};
+}
 
 export default App;

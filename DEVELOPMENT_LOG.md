@@ -37,3 +37,10 @@
   2. React와 Tailwind CSS를 사용하여 HabitList.jsx 컴포넌트를 만들어줘. habits 배열을 받아 목록을 렌더링하고, 각 항목에 일일 체크 버튼(handleCheck 호출)과 연속 성공일(Streak)을 표시하는 뱃지를 포함해줘. 파일 경로는 src/components/HabitList.jsx야.
 - **결과 및 수정사항**: CRUD 폼 및 목록 UI 초안 생성. 다음 단계에서 App.jsx에 import 후 연결 필요.
 - **학습 내용**: AI에게 복잡한 로직 구현 후 UI 요청 시, 데이터 흐름(props)을 명확히 정의해줘야 오류가 적음을 확인.
+
+### Day 4 (2025.10.27) - 최종 통합 및 검증
+- **작업 내용**: CalendarDashboard 컴포넌트 구현 및 App.jsx에 최종 통합. React와 Tailwind CSS 환경 구성 완료 및 모든 기능(CRUD, Streak, 시각화) 동작 검증.
+- **Gemini CLI 사용 프롬프트**:
+  1. React와 Tailwind CSS를 사용하여 CalendarDashboard.jsx 컴포넌트를 만들어줘. habits 배열을 받아 월별로 습관 기록(records)을 시각화하는 간단한 달력 대시보드 UI를 구현해줘. 각 날짜 블록에 성공 여부를 색상으로 표시해야 해. 파일 경로는 src/components/CalendarDashboard.jsx야.
+- **결과 및 수정사항**: 모든 컴포넌트가 의도대로 동작함을 확인. App.jsx의 레이아웃을 Tailwind 그리드 시스템으로 수정하여 반응형 디자인 완성.
+- **학습 내용**: AI의 초기 코드를 받더라도, 프로젝트의 아키텍처(컴포넌트 간 데이터 흐름 및 레이아웃)는 개발자가 직접 통합하고 조정해야 함.
