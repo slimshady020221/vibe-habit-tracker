@@ -1,0 +1,29 @@
+{
+  "name": "vibe-habit-tracker",
+  "version": "1.0.0",
+  "description": "Minimal Habit Tracker built with React and Tailwind CSS.",
+  "main": "src/index.js",
+  "homepage": ".",  /* <-- 경로 문제 해결을 위한 필드 추가 */
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test"
+  },
+  "keywords": [
+    "react",
+    "tailwind",
+    "gemini-cli"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.3"
+  }
+}

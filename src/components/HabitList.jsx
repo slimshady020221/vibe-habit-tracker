@@ -11,13 +11,13 @@ const getStartOfWeek = (date) => {
 }
 
 // ProgressBar Component
-const ProgressBar = ({ percentage }) => {
+const ProgressBar = ({ percentage, color }) => {
   const cappedPercentage = Math.min(percentage, 100);
   return (
-    <div className="w-full bg-gray-200 rounded-full h-2.5">
+    <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
       <div 
-        className="bg-blue-500 h-2.5 rounded-full transition-all duration-500"
-        style={{ width: `${cappedPercentage}%` }}
+        className="h-2.5 rounded-full transition-all duration-500"
+        style={{ width: `${cappedPercentage}%`, backgroundColor: color || '#4f46e5' }}
       ></div>
     </div>
   );
@@ -34,7 +34,6 @@ const HabitList = ({ habits, onCheck, onDelete }) => {
     let relevantCompletions = [];
 
     if (frequency === 'Daily') {
-        // Daily progress is just 0% or 100% for the day
         const isCompletedToday = completedDates.includes(today);
         return { current: isCompletedToday ? 1 : 0, percentage: isCompletedToday ? 100 : 0 };
     } else if (frequency === 'Weekly') {
@@ -51,27 +50,37 @@ const HabitList = ({ habits, onCheck, onDelete }) => {
   };
 
   if (habits.length === 0) {
-    return <p className="text-center text-gray-500">아직 등록된 습관이 없습니다. 새로운 습관을 추가해보세요!</p>;
+    return <p className="text-center text-gray-500 dark:text-gray-400">아직 등록된 습관이 없습니다. 새로운 습관을 추가해보세요!</p>;
   }
 
   return (
     <ul className="space-y-4">
       {habits.map(habit => {
         const progress = calculateProgress(habit);
+        const isCompletedToday = habit.completedDates?.includes(today);
+        const habitColor = habit.color || '#4f46e5';
+
         return (
-          <li key={habit.id} className="bg-white p-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
+          <li key={habit.id} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center">
                 <button
                   onClick={() => onCheck(habit.id)}
-                  className={`w-8 h-8 rounded-full border-2 flex-shrink-0 mr-4 flex items-center justify-center ${habit.completedDates?.includes(today) ? 'bg-green-500 border-green-600 text-white' : 'border-gray-300 hover:bg-gray-100'}`}
+                  className={`w-8 h-8 rounded-full border-2 flex-shrink-0 mr-4 flex items-center justify-center text-white`}
+                  style={{ 
+                    backgroundColor: isCompletedToday ? habitColor : 'transparent', 
+                    borderColor: habitColor 
+                  }}
                 >
-                  {habit.completedDates?.includes(today) && '✔'}
+                  {isCompletedToday && '✔'}
                 </button>
-                <span className="font-medium text-gray-800">{habit.name}</span>
+                <span className="font-medium text-gray-800 dark:text-gray-200">{habit.name}</span>
               </div>
               <div className="flex items-center">
-                <span className="text-sm font-semibold bg-blue-100 text-blue-800 px-2 py-1 rounded-full mr-4">
+                <span 
+                  className="text-sm font-semibold px-2 py-1 rounded-full mr-4"
+                  style={{ backgroundColor: `${habitColor}20`, color: habitColor }}
+                >
                   연속 {getStreak(habit.completedDates)}일
                 </span>
                 <button
@@ -84,11 +93,11 @@ const HabitList = ({ habits, onCheck, onDelete }) => {
             </div>
             {habit.frequency !== 'Daily' && (
                 <div className="mt-3">
-                    <div className="flex justify-between text-sm text-gray-600 mb-1">
+                    <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
                         <span>진행률</span>
                         <span>{progress.current} / {habit.targetCount}</span>
                     </div>
-                    <ProgressBar percentage={progress.percentage} />
+                    <ProgressBar percentage={progress.percentage} color={habitColor} />
                 </div>
             )}
           </li>
